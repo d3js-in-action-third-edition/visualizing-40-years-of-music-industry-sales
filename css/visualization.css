@@ -1,0 +1,22 @@
+/* Responsive container of the svg element */
+.responsive-svg-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Axis and ticks */
+.axis path,
+.tick line {
+  stroke-opacity: 0.7;
+}
+.axis-x-stream path {
+  stroke-opacity: 0;
+}
+.axis-x-stream text {
+  fill-opacity: 0;
+}
+.tick text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
