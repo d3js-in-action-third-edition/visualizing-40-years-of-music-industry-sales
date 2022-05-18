@@ -2,14 +2,6 @@ const drawDonutCharts = (data) => {
   const formats = data.columns.filter(support => support !== "year");
   console.log("formats", formats);
 
-  const bandScale = d3.scaleBand()
-    .domain(data.map(d => d.year))
-    .range([0, innerWidth])
-    .paddingInner(0.2);
-  colorScale = d3.scaleOrdinal()
-    .domain(formatsInfo.map(f => f.id))
-    .range(formatsInfo.map(f => f.color));
-
   const svg = d3.select("#donut")
     .append("svg")
       .attr("viewBox", `0 0 ${width} ${height}`);
@@ -28,7 +20,7 @@ const drawDonutCharts = (data) => {
 
     const donutContainer = donutsContainer
       .append("g")
-        .attr("transform", `translate(${bandScale(year)}, ${innerHeight/2})`);
+        .attr("transform", `translate(${xScale(year)}, ${innerHeight/2})`);
 
     // Initialize the pie generator
     const pieGenerator = d3.pie()
