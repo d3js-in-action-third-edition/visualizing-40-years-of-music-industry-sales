@@ -15,5 +15,5 @@ const addLengend = () => {
     .append("span")
       .attr("class", "color-legend-item-label")
       .text(d => d.label);
-
+  
 };

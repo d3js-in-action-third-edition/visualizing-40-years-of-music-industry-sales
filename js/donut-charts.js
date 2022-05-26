@@ -1,36 +1,50 @@
 const drawDonutCharts = (data) => {
-  const formats = data.columns.filter(support => support !== "year");
-  console.log("formats", formats);
 
+  /*******************************/
+  /*    Append the containers    */
+  /*******************************/
+  // Append the SVG container
   const svg = d3.select("#donut")
     .append("svg")
       .attr("viewBox", `0 0 ${width} ${height}`);
 
-   const donutsContainer = svg
+  // Append the group that will contain the inner chart
+  const donutContainers = svg
     .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+  
+  /**********************************/
+  /*    Create a donut chart for    */
+  /*    each year of interest       */
+  /**********************************/
   const years = [1975, 1995, 2013];
+  const formats = data.columns.filter(format => format !== "year");
   years.forEach(year => {
-    const yearData = data.find(d => d.year === year);
-    const pieData = [];
-    formats.forEach(support => {
-      pieData.push({ support: support, sales: yearData[support] });
-    });
 
-    const donutContainer = donutsContainer
+    // Append a group for each year
+    // and translate it to the proper position
+    const donutContainer = donutContainers
       .append("g")
         .attr("transform", `translate(${xScale(year)}, ${innerHeight/2})`);
 
-    // Initialize the pie generator
+    // Prepare the data for the pie generator
+    const yearData = data.find(d => d.year === year);
+    const formattedData = [];
+    formats.forEach(format => {
+      formattedData.push({ format: format, sales: yearData[format] });
+    });
+    console.log("formattedData", formattedData);
+
+    // Initialize the pie layout generator
     const pieGenerator = d3.pie()
-      .value(d => d.sales)
-      .sortValues((a, b) => b - a);
+      .value(d => d.sales);
 
     // Call the pie generator to obtain the annotated data
-    const arcsData = pieGenerator(pieData);
+    const annotatedData = pieGenerator(formattedData);
+    console.log("annotatedData", annotatedData)
 
-    // Initialize arc generator
+    // Initialize the arc generator
     const arcGenerator = d3.arc()
       .startAngle(d => d.startAngle)
       .endAngle(d => d.endAngle)
@@ -39,20 +53,20 @@ const drawDonutCharts = (data) => {
       .padAngle(0.02)
       .cornerRadius(3);
 
-    // Append arcs
+    // Append the arcs
     const arcs = donutContainer
       .selectAll(`path.arc-${year}`)
-      .data(arcsData)
+      .data(annotatedData)
       // .join("path")
       //   .attr("class", `arc-${year}`)
       //   .attr("d", arcGenerator)
-      //   .attr("fill", d => colorScale(d.data.support));
-      .join("g")
+      //   .attr("fill", d => colorScale(d.data.format));
+        .join("g")
         .attr("class", `arc-${year}`);
     arcs
       .append("path")
         .attr("d", arcGenerator)
-        .attr("fill", d => colorScale(d.data.support));
+        .attr("fill", d => colorScale(d.data.format));
     arcs
       .append("text")
         .text(d => {
@@ -69,12 +83,13 @@ const drawDonutCharts = (data) => {
         .attr("y", d => d.centroid[1])
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
+        .attr("fill", "#f6fafc")
+        .attr("fill-opacity", d => d.percentage < 0.05 ? 0 : 1)
         .style("font-size", "16px")
-        .style("font-weight", 500)
-        .style("fill", "#f6fafc")
-        .style("fill-opacity", d => d.percentage < 0.05 ? 0 : 1);
+        .style("font-weight", 500);
 
-    // Append years
+
+    // Append year labels
     donutContainer
       .append("text")
         .text(year)
@@ -83,8 +98,7 @@ const drawDonutCharts = (data) => {
         .style("font-size", "24px")
         .style("font-weight", 500);
 
-
   });
 
-  
+
 };
